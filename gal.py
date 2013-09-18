@@ -1,7 +1,7 @@
 
 """
-gal v0.01
-
+gal v0.01.1
+ga-bitbot-revived based on:
 ga-bitbot application / system launcher
 
 Copyright 2011 Brian Monkaba
@@ -22,7 +22,7 @@ This file is part of ga-bitbot.
     along with ga-bitbot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-__appversion__ = "0.01a"
+__appversion__ = "0.01.1"
 print "ga-bitbot application system launcher v%s"%__appversion__
 
 import atexit
@@ -247,17 +247,17 @@ def shutdown():
 atexit.register(shutdown)
 
 
-#capture the price feeds regardless of client or server mode
+#capture the price feeds regardless of client or server mode   ## commented out bcfeed_synch.py and bcfeed.py to allow for manual starting
 #servers need it for reporting and clients need it for processing
 
 #update the dataset
-print "gal: Synching the local datafeed..."
-Popen(shlex.split('python bcfeed_synch.py -d')).wait()
+#print "gal: Synching the local datafeed..."
+#Popen(shlex.split('python bcfeed_synch.py -d')).wait()
 
 #launch the bcfeed script to collect data from the live feed
-print "gal: Starting the live datafeed capture script..."
-p = Popen(shlex.split('python bcfeed.py'),stdin=fnull, stdout=fnull, stderr=BCFEED_STDERR_FILE)
-no_monitor.append(p)
+#print "gal: Starting the live datafeed capture script..."
+#p = Popen(shlex.split('python bcfeed.py'),stdin=fnull, stdout=fnull, stderr=BCFEED_STDERR_FILE)
+#no_monitor.append(p)
 
 if run_server:
     print "gal: Launching the xmlrpc server..."

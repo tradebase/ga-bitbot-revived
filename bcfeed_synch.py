@@ -19,7 +19,8 @@ Without the -d switch the output will only be written to the datafeed_reboot fol
 """%(__app_version__)
 print "-"*80
 
-link = """http://bitcoincharts.com/t/trades.csv?symbol=mtgoxUSD&start={START_TIME}"""
+#link = """http://bitcoincharts.com/t/trades.csv?symbol=mtgoxUSD&start={START_TIME}"""  #Commented out old link
+link = """http://api.bitcoincharts.com/v1/csv/mtgoxUSD.csv"""  #Added new link from issue 69 comment 5
 start_time = 0      #don't change these variables - they are automaticaly configured
 incremental_update = 0  #based on command line options
 auto_move_output = 0    #
@@ -37,7 +38,7 @@ if len(sys.argv) >= 2:
             print "bcfeed_synch: Incremental update not possible."
             pass
         print "bcfeed_synch: Downloading mtgox historic data..."
-        link = link.replace('{START_TIME}',str(start_time))
+        #link = link.replace('{START_TIME}',str(start_time))  # commented out link modification.  issue 69 comment 5
         data = urllib2.urlopen(link).read()
         f = open("./datafeed_reboot/download_mtgoxUSD.csv",'w')
         f.write(data)
