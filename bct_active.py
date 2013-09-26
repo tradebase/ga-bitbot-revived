@@ -122,7 +122,7 @@ class trade_engine:
         return
 
     def load_input_data(self):
-        print "bct_alt: loading input data"
+        print "bct_active: loading input data"
         self.input_data = None
         if self.cache_input == True:
             cache_label = self.input_file_name +'::'+str(self.max_length)
@@ -140,30 +140,30 @@ class trade_engine:
                 r = row.split(',')[1] #last price
                 t = row.split(',')[0] #time
                 self.input_data.append([int(float(t)),float(r)])
-            print "bct_alt: input data loaded from file."
+            print "bct_active: input data loaded from file."
             if self.cache_input == True:
                 self.cache.set(cache_label,self.input_data)
                 self.cache.expire(cache_label,60*15)
         else:
-            print "bct_alt:: cached data found.",cache_label
+            print "bct_active:: cached data found.",cache_label
         self.input_data_length = len(self.input_data)
         return
 
     def initialize(self):
-        print "bct_alt: initializing"
+        print "bct_active: initializing"
         self.load_input_data()
         cm = None
         if self.cache_input == True:
             cache_label = self.input_file_name + '::bct_active::'+str(self.max_length)+'::atr_depth::'+str(self.atr_depth)
             cm = self.cache.get(cache_label)
         if cm == None:
-            print "bct_alt: classifying market data..."
+            print "bct_active: classifying market data..."
             self.classify_market(self.input_data)
             if self.cache_input == True:
                 self.cache.set(cache_label,self.market_class)
                 self.cache.expire(cache_label,60*15)
         else:
-            print "bct_alt: cached market classification data found.",cache_label
+            print "bct_active: cached market classification data found.",cache_label
             self.market_class = cm
             self.classified_market_data = True
         return self.current_quartile
@@ -645,7 +645,7 @@ class trade_engine:
         #only htmlize the last positions so the browser doesn't blow up ;)
         reported_position_count_limit = 200
         reported_position_count = 0
-        print "bct_alt:log_orders: generating html table for %s positions"%(len(self.positions))
+        print "bct_active:log_orders: generating html table for %s positions"%(len(self.positions))
         for p in self.positions:
             if reported_position_count >= reported_position_count_limit:
                 break
@@ -787,7 +787,7 @@ class trade_engine:
             q = (i + 1) / 4.0
             mc.insert(0,[t,q])
 
-        print "bct_alt:chart: compressing data"
+        print "bct_active:chart: compressing data"
         if not basic_chart:
             wl = str(self.compress_log(self.logs.get('wll')[periods:])).replace('L','')
             ws = str(self.compress_log(self.logs.get('wls')[periods:])).replace('L','')
@@ -824,7 +824,7 @@ class trade_engine:
             stop = str(self.logs.get('stop')[periods:]).replace('L','')
             trigger_price = str(self.compress_log(self.logs.get('trigger')[periods:],lossless_compression = True)).replace('L','')
         else:
-            print "bct_alt:chart: selecting data"
+            print "bct_active:chart: selecting data"
             #get the timestamp for the start index
             time_stamp = self.logs.get('price')[periods:periods+1][0][0]
             #search the following for the time stamp
@@ -845,7 +845,7 @@ class trade_engine:
                     trigger_price = str(self.logs._log['trigger'][i:]).replace('L','')
                     break
 
-        print "bct_alt:chart: filling the template"
+        print "bct_active:chart: filling the template"
         tmpl = tmpl.replace("{LAST_UPDATE}",time.ctime())
         tmpl = tmpl.replace("{PRICES}",input)
         tmpl = tmpl.replace("{WINDOW_LONG}",wl)
@@ -861,12 +861,12 @@ class trade_engine:
         tmpl = tmpl.replace("{VOLATILITY_QUARTILE}",volatility_quartile)
 
         if write_cache_only == False:
-            print "bct_alt:chart: writing the data to a file"
+            print "bct_active:chart: writing the data to a file"
             f = open(filename,'w')
             f.write(tmpl)
             f.close()
         if self.cache_chart == True:
-            print "bct_alt:chart: caching html chart:",filename
+            print "bct_active:chart: caching html chart:",filename
             self.cache.set(filename,tmpl)
         return
 
