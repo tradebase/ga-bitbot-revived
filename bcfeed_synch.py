@@ -19,30 +19,42 @@ Without the -d switch the output will only be written to the datafeed_reboot fol
 """%(__app_version__)
 print "-"*80
 
-#link = """http://bitcoincharts.com/t/trades.csv?symbol=mtgoxUSD&start={START_TIME}"""  #Commented out old link
-link = """http://api.bitcoincharts.com/v1/csv/mtgoxUSD.csv"""  #Added new link from issue 69 comment 5
+link = """http://bitcoincharts.com/t/trades.csv?symbol=mtgoxUSD&start={START_TIME}"""  #Commented out old link
+#link = """http://api.bitcoincharts.com/v1/csv/mtgoxUSD.csv"""  #Added new link from issue 69 comment 5
 start_time = 0      #don't change these variables - they are automaticaly configured
 incremental_update = 0  #based on command line options
 auto_move_output = 0    #
+
+def get_last_datafeed_time(self,file_path):
+	for line in open(file_path):pass
+	line = line.split(',')[0]
+	line = line.split('.')[0]
+	return int(line)
 
 if len(sys.argv) >= 2:
     if sys.argv[1] == '-d':
         try:
             print "bcfeed_synch: Checking potential for incremental update..."
-            for line in open('./datafeed/bcfeed_mtgoxUSD_1min.csv'):pass
-            line = line.split(',')[0]
-            line = line.split('.')[0]
-            start_time = int(line) + 60
+            start_time = get_last_datafeed_time('./datafeed/bcfeed_mtgoxUSD_1min.csv') + 60
             incremental_update = 1
         except:
             print "bcfeed_synch: Incremental update not possible."
             pass
         print "bcfeed_synch: Downloading mtgox historic data..."
-        #link = link.replace('{START_TIME}',str(start_time))  # commented out link modification.  issue 69 comment 5
-        data = urllib2.urlopen(link).read()
-        f = open("./datafeed_reboot/download_mtgoxUSD.csv",'w')
-        f.write(data)
-        f.close()
+        first_write = True
+		while (start_time <= (time.time() + 60)):
+			link = link.replace('{START_TIME}',str(start_time))  # commented out link modification.  issue 69 comment 5
+			data = urllib2.urlopen(link).read()
+			reader = csv.reader(data, delimiter=",")
+			sorted_data = sorted(reader, key=operator.itemgetter(0), reverse=True) 
+			if first_write:
+				f = open("./datafeed_reboot/download_mtgoxUSD.csv",'w')
+				first_write = False
+			else
+				f = open("./datafeed_reboot/download_mtgoxUSD.csv",'a')
+			f.write(sorted_data)
+			f.close()
+			start_time = (get_last_datafeed_time('./datafeed_reboot/download_mtgoxUSD.csv') + 60
         auto_move_output = 1
         print "bcfeed_synch: Download complete."
     else:
