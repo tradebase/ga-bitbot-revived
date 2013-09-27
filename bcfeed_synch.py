@@ -54,7 +54,7 @@ if len(sys.argv) >= 2:
 				f = open("./datafeed_reboot/download_mtgoxUSD.csv",'a')
 			f.write(sorted_data)
 			f.close()
-			start_time = (get_last_datafeed_time('./datafeed_reboot/download_mtgoxUSD.csv') + 60
+			start_time = (get_last_datafeed_time('./datafeed_reboot/download_mtgoxUSD.csv') + 60)
         auto_move_output = 1
         print "bcfeed_synch: Download complete."
     else:
