@@ -37,6 +37,9 @@ var rpcClient = xmlrpc.createClient({ host: '127.0.0.1', port: 9854, path: '/gen
 var ch_depth = '24e67e0d-1cad-4cc0-9e7a-f8523ef460fe';
 var ch_trades = 'dbf1dee9-4f2e-4a08-8cb7-748919a71b21';
 var ch_ticker = 'd5f06780-30a8-4a48-a2f8-7ed181b4a13f';
+
+var key_subscribe = 'sub-c-50d56e1e-2fd9-11e3-a041-02ee2ddab7fe';
+
 var trade_buffer = [];
 
 var full_depth = "";
@@ -230,34 +233,33 @@ gabb.on('connection', function (socket) {
 //
 // create client socket.io connection to MtGox
 //
-var ioc = require('socket.io-client');
-var serverUrl = 'https://socketio.mtgox.com:443/mtgox';
-var conn = ioc.connect(serverUrl);
+var pubnub = require('pubnub').init({
+	publish_key:    "demo",
+	subscribe_key:  "sub-c-50d56e1e-2fd9-11e3-a041-02ee2ddab7fe"
+});
 
-conn.on('connect',    onConnect);
-conn.on('disconnect', onDisconnect);
-conn.on('error',      onError);
-conn.on('message',    onMessage);
+[ch_depth, ch_trades, ch_ticker].forEach(function(channel) {
+ 	pubnub.subscribe({
+ 		channel: channel,
+ 		connect: onConnect,
+ 		disconnect: onDisconnect,
+ 		error: onError,
+ 		message: onMessage
+ 	})
+ });
 
+ 
 function onConnect(msg)
 {
-	if (conn.socket.connected) {
-		sub = {"channel":ch_depth,"op":"subscribe"};
-		conn.send(sub);
-		sub = {"channel":ch_trades,"op":"subscribe"};
-		conn.send(sub);
-		sub = {"channel":ch_ticker,"op":"subscribe"};
-		conn.send(sub);
-		console.log('CONNECTED : ' + serverUrl);
-	}
+	console.log('CONNECTED to mtgox channel:', msg);
 }
 function onError(msg)
 {
-	console.log('MSG ERROR :' + serverUrl);
+	console.log('MSG ERROR :', msg);
 }
 function onDisconnect(msg)
 {
-	console.log('DISCONNECTED : ' + serverUrl);
+	console.log('DISCONNECTED : ', msg);
 }
 function onMessage(msg)
 {
