@@ -10,6 +10,6 @@
     "jade": "*",
     "socket.io":"*",
     "socket.io-client":"*",
-	"pubnub":"*"
+	  "pubnub":"*"
   }
 }
